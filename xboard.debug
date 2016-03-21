@@ -1,0 +1,35 @@
+recognized 'normal' (-1) as variant normal
+recognized 'normal' (-1) as variant normal
+recognized 'normal' (-1) as variant normal
+shuffleOpenings = 0
+resolved -adobe-helvetica-bold-r-normal--34-240-100-100-p-182-iso8859-1 at pixel size 34
+  to -adobe-helvetica-bold-r-normal--34-240-100-100-p-182-iso8859-1
+resolved -adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1 at pixel size 12
+  to -adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1
+resolved -adobe-helvetica-medium-r-normal--14-100-100-100-p-76-iso8859-1 at pixel size 14
+  to -adobe-helvetica-medium-r-normal--14-100-100-100-p-76-iso8859-1
+xboard 4.5.3 + sass
+Reset(1, 0) from gameMode 0
+recognized 'normal' (-1) as variant normal
+GameEnds(0, (null), 2)
+shuffleOpenings = 0
+TC string = ':30'
+mps=0 tc=30000 inc=0
+TC string = ':30'
+mps=0 tc=30000 inc=0
+221 >first : xboard
+protover 2
+shuffleOpenings = 0
+309 <first : feature myname="Tony's Chess Engine: SassyFrass" usermove=1 done=1
+309 >first : accepted myname
+309 >first : accepted usermove
+310 >first : accepted done
+311 >first : new
+random
+311 >first : level 0 0:30 0
+311 >first : post
+311 >first : hard
+GameEnds(28, xboard exit, 2)
+22846 >first : result * {xboard exit}
+22847 >first : force
+22847 >first : quit
