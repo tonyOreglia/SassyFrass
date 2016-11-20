@@ -25,7 +25,7 @@ using namespace std;
 bool convert_algebraic(string x, string y, int &xx, int &yy);
 
 int main(int argc, char *argv[]) {
-   string   cmnd;
+    string   cmnd;
 	string   from;
 	string   dest;
 	string   input;
