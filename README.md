@@ -1,2 +1,0 @@
-# SassyFrass
-c++ chess engine 
