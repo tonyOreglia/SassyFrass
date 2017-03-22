@@ -1,15 +1,6 @@
 #include <iostream>
-
-#include "macros.txt"
-#include "eng_global.h"
-
 #include "game.h"
-#include "board.h"
-
-#include "attack_tables.txt"
-#include "attack_rays.txt"
-#include "sqLookup.txt"
-#include "piece_tables"
+#include "global.h"
 
 game::game()
 {
@@ -30,22 +21,19 @@ game::~game() {
 }
 
 int game::evaluate(){
-//    if(DEBUG_MODE)
-//        perft++;
-    
+   if(DEBUG_MODE)
+       perft++;
     int b_piece_cnt = 0;
     int w_piece_cnt = 0;
     char w_king_pos;
     char b_king_pos;
     int pos = 0;
-    
     short unsigned int w_bishop_count, w_knight_count;
     short unsigned int b_bishop_count, b_knight_count;
     short unsigned int bishop_pos, knight_pos, pawn_pos;
-    
+
     U64 white_king = position->pieceBB[position->white_king];
     U64 black_king = position->pieceBB[position->black_king];
-    
     U64 white_bishops = position->pieceBB[position->white_bishops];
     U64 black_bishops = position->pieceBB[position->black_bishops];
     U64 white_knights = position->pieceBB[position->white_knights];
@@ -58,22 +46,18 @@ int game::evaluate(){
     U64 black_queens = position->pieceBB[position->black_queens];
     U64 white_pieces = position->pieceBB[position->white_pieces];
     U64 black_pieces = position->pieceBB[position->black_pieces];
-    
     pos += 20000 * (popcount(white_king) - popcount(black_king));
     pos += king_bonus_w[lsb_scan(white_king)] - king_bonus_b[lsb_scan(black_king)];
-    
     w_bishop_count = popcount(white_bishops);
     b_bishop_count = popcount(black_bishops);
     w_piece_cnt = popcount(white_pieces);
     b_piece_cnt = popcount(black_pieces);
-    
-    
     pos += 510 * (popcount(white_rooks) - popcount(black_rooks));
     pos += 320 * (popcount(white_knights) - popcount(black_knights));
     pos += 330 * (popcount(white_bishops) - popcount(black_bishops));
     pos += 100 * (popcount(white_pawns) - popcount(black_pawns));
     pos += 890 * (popcount(white_queens) - popcount(black_queens));
-    
+
     while(white_bishops) {
         bishop_pos = lsb_scan(white_bishops);
         pos += bishop_bonus_w[bishop_pos];
@@ -104,7 +88,6 @@ int game::evaluate(){
         pos -= pawn_bonus_b[pawn_pos];
         black_pawns ^= (1ULL << pawn_pos);
     }
-   
     if((b_piece_cnt + w_piece_cnt) < 16) {
         pos += king_endgame_bonus_w[lsb_scan(white_king)];
         pos -= king_endgame_bonus_b[lsb_scan(black_king)];
@@ -113,122 +96,12 @@ int game::evaluate(){
         pos += king_bonus_b[lsb_scan(white_king)];
         pos -= king_bonus_b[lsb_scan(black_king)];
     }
-
-    
-    
-    
-        //w_piece_cnt = __builtin_popcount(position->pieceBB[position->white_pieces]);
-        //b_piece_cnt = __builtin_popcount(position->pieceBB[position->black_pieces]);
-    
-
-    /*
-    
-    for(char i=0; i<64; i++) {
-        if (position->charBoard[i] == position->white_king) {
-            w_piece_cnt++;
-            pos += 20000;
-            pos += king_bonus_w[i];
-            w_king_pos = i;
-        }
-        if (position->charBoard[i] == position->white_queens) {
-                w_piece_cnt++;
-            pos += 880;
-        }
-        else if (position->charBoard[i] ==  position->white_rooks) {
-                w_piece_cnt++;
-            pos += 510;
-        }
-        else if (position->charBoard[i] ==  position->white_bishops) {
-                w_piece_cnt++;
-            pos += 333;
-            pos += bishop_bonus_w[i];
-            w_bishop_count++;
-        }
-        else if (position->charBoard[i] ==  position->white_knights) {
-                w_piece_cnt++;
-            pos += 320;
-            pos += knight_bonus[i];
-        }
-        else if (position->charBoard[i] ==  position->white_pawns) {
-            w_piece_cnt++;
-            pos += 100;
-            pos += pawn_bonus_w[i];
-        }
-        else if (position->charBoard[i] ==  position->black_king) {
-            b_piece_cnt++;
-            b_king_pos = i;
-            pos -= 20000;
-            pos -= king_bonus_b[i];
-        }
-        else if (position->charBoard[i] ==  position->black_queens) {
-            b_piece_cnt++;
-            pos -= 880;
-        }
-        else if (position->charBoard[i] ==  position->black_rooks) {
-            b_piece_cnt++;
-            pos -= 510;
-        }
-        else if (position->charBoard[i] ==  position->black_bishops) {
-            b_piece_cnt++;
-            pos -= 333;
-            pos -= bishop_bonus_b[i];
-            b_bishop_count++;
-        }
-        else if (position->charBoard[i] ==  position->black_knights) {
-            b_piece_cnt++;
-            pos -= 320;
-            pos -= knight_bonus[i];
-        }
-        else if (position->charBoard[i] ==  position->black_pawns) {
-            b_piece_cnt++;
-            pos -= 100;
-            pos -= pawn_bonus_b[i];
-        }
-    }
-    
-     
-    char cnt = 0;
-    if(position->has_castled[LIGHT]) {
-        pos += 50;
-    }
-    else {
-        if(!position->can_castle[position->white_king]) {
-            pos -= 25;
-            cnt++;
-        }
-        if(!position->can_castle[position->white_queens]) {
-            pos -= 25;
-            cnt++;
-        }
-        if(cnt == 2)
-            pos -= 25;
-    }
-    
-    cnt = 0;
-    if(position->has_castled[DARK]) {
-        pos -= 50;
-    }
-    else {
-        if(!position->can_castle[position->black_king]) {
-            pos += 25;
-            cnt++;
-        }
-        if(!position->can_castle[position->black_queens]) {
-            pos += 25;
-            cnt++;
-        }
-        if(cnt == 2)
-            pos += 25;
-    }*/
-    
     if(w_bishop_count >= 2) {
         pos += 15;
     }
     if(b_bishop_count >= 2) {
         pos -= 15;
     }
-    
-    
     return pos;
 }
 
@@ -366,7 +239,7 @@ bool game::mate_check() {
     position->switch_side();
     int total = position->move_t.size();
         //std::cout << "# moves: " << position->move_t.size();
-    
+
     for(int i = start; i < total; i++) {
             //std::cout << "i: " << i << std::endl;
             //std::cout << position->king+position->side << " == ";
@@ -387,7 +260,7 @@ void game::generate_moves() {
         assert(position->integrity());
     U64 valid_attack_set, temp;
     char sigBit, sq;
-    
+
     //////////////////////////////////////
     //BISHOP MOVES
     /////////////////////////////////////
@@ -395,21 +268,21 @@ void game::generate_moves() {
     while(temp) {
         sq = lsb_scan(temp);
         temp ^= sqBB[sq];
-        
+
         valid_attack_set = northEastAttack(sq);
         valid_attack_set |= northWestAttack(sq);
         valid_attack_set |= southEastAttack(sq);
         valid_attack_set |= southWestAttack(sq);
         valid_attack_set &= (~position->pieceBB[position->pieces+position->side]);
-        
-        
-        
+
+
+
         if(valid_attack_set) {
             dest_sqs = serialize(valid_attack_set);
             push_moves(dest_sqs, sq, position->bishops+position->side);
         }
     }
-    
+
     //////////////////////////////////////
     //ROOK MOVES
     /////////////////////////////////////
@@ -418,19 +291,19 @@ void game::generate_moves() {
     while(temp) {
         sq = lsb_scan(temp);
         temp ^= sqBB[sq];
-        
+
         valid_attack_set = northAttack(sq);
         valid_attack_set |= southAttack(sq);
         valid_attack_set |= eastAttack(sq);
         valid_attack_set |= westAttack(sq);
         valid_attack_set &= (~position->pieceBB[position->pieces+position->side]);
-        
+
         ///need to turn off castling for rook moves! ?????/////
         while(valid_attack_set) {
             sigBit = lsb_scan(valid_attack_set);
             valid_attack_set ^= sqBB[sigBit];
             push_single_move(sigBit, sq, position->rooks+position->side);
-            
+
                 ///note: the if statements below are necessary so that on the unmake move fxn
                 //the castle ability can be re established with confidence
             if(position->can_castle[position->king+position->side] && (sq == 7 || sq == 63))
@@ -443,28 +316,28 @@ void game::generate_moves() {
     //QUEEN MOVES
     /////////////////////////////////////
     temp = position->pieceBB[position->queens+position->side];
-    
+
     while(temp) {
         sq = lsb_scan(temp);
         temp ^= sqBB[sq];
-        
+
         valid_attack_set = northEastAttack(sq);
         valid_attack_set |= northWestAttack(sq);
         valid_attack_set |= southEastAttack(sq);
         valid_attack_set |= southWestAttack(sq);
-        
+
         valid_attack_set |= northAttack(sq);
         valid_attack_set |= southAttack(sq);
         valid_attack_set |= eastAttack(sq);
         valid_attack_set |= westAttack(sq);
-        
+
         valid_attack_set &= (~position->pieceBB[position->pieces+position->side]);
-        
-        
+
+
         dest_sqs = serialize(valid_attack_set);
         push_moves(dest_sqs, sq, position->queens+position->side);
     }
-    
+
     ////////////////////////////////
     //KNIGHT MOVES
     ////////////////////////////////
@@ -472,13 +345,13 @@ void game::generate_moves() {
     while(temp) {
         sq = lsb_scan(temp);
         temp ^= sqBB[sq];
-        
+
         valid_attack_set = (knightAtt[sq] & (~position->pieceBB[position->pieces+position->side]));
-        
+
         dest_sqs = serialize(valid_attack_set);
         push_moves(dest_sqs, sq, position->knights+position->side);
     }
-    
+
     /////////////////////////////////////////////////////
     //KING MOVES//
     ////////////////////////////////////////////////////
@@ -486,19 +359,19 @@ void game::generate_moves() {
     temp = position->pieceBB[king];
     U64 b_bad_pawn = sqBB[11] | sqBB[13];
     U64 w_bad_pawn = sqBB[51] | sqBB[53];
-    
+
     sq = lsb_scan(temp);
     valid_attack_set = (kingAtt[sq] & (~position->pieceBB[position->pieces+position->side]));
-    
+
 	   bool kingside = !((sqBB[sq+1] | sqBB[sq+2]) & position->occupied_squares); //true if the castling squares are open.
     bool queenside = !((sqBB[sq-1] | sqBB[sq-2] | sqBB[sq-3]) & position->occupied_squares); //same
-    
+
     if((position->side == LIGHT) && (b_bad_pawn & position->pieceBB[position->black_pawns]))//((position->charBoard[11] == (position->black_pawns)) | (position->charBoard[13] == position->black_pawns))) {
     {kingside = false; queenside = false; }
     if((position->side == DARK) && (w_bad_pawn & position->pieceBB[position->white_pawns]))//((position->charBoard[51] == (position->white_pawns)) | (position->charBoard[53] == position->white_pawns))){
     {kingside = false; queenside = false;}
-    
-    
+
+
     while(valid_attack_set) {
         sigBit = lsb_scan(valid_attack_set);
         valid_attack_set ^= sqBB[sigBit];
@@ -509,7 +382,7 @@ void game::generate_moves() {
         if(position->can_castle[position->queens + position->side])
             position->move_t.back().canCastle_off[position->queens+position->side] = true;
     }
-    
+
         //castle kingside
     if(position->can_castle[king] && kingside) {
         push_single_move(sq+2, sq, king);
@@ -526,17 +399,17 @@ void game::generate_moves() {
             position->move_t.back().canCastle_off[king] = true;
         position->move_t.back().canCastle_off[position->queens+position->side] = true;
    	}
-    
+
     //////////////////////////////////////////
     //PAWN MOVES///
     //////////////////////////////////////////
     if(position->side==LIGHT) {
         temp = position->pieceBB[position->white_pawns];
-        
+
         valid_attack_set = position->pieceBB[position->white_pawns] << 8; //single push
         valid_attack_set &= (~position->pieceBB[position->white_pieces]);
         valid_attack_set &= (~position->pieceBB[position->black_pieces]);
-        
+
         temp = valid_attack_set;
         while(temp) {
             sq = lsb_scan(temp);
@@ -544,12 +417,12 @@ void game::generate_moves() {
             push_single_move(sq, sq-8, position->white_pawns);
             if(sq >= 56) {push_promotion(sq, -8); }
         }
-        
+
         valid_attack_set = valid_attack_set << 8; //double push
         valid_attack_set &= (~position->pieceBB[position->white_pieces]);
         valid_attack_set &= (~position->pieceBB[position->black_pieces]);
         valid_attack_set &= row4;
-        
+
         temp = valid_attack_set;
         while(temp) {
             sq = lsb_scan(temp);
@@ -557,12 +430,12 @@ void game::generate_moves() {
             push_single_move(sq, sq-16, position->white_pawns);
             position->move_t.back().enPassant= sq-8;
         }
-        
+
         valid_attack_set = position->pieceBB[position->white_pawns]; //attack right
         valid_attack_set = valid_attack_set << 9;
         valid_attack_set &= notAfile;
         valid_attack_set &= (position->pieceBB[position->black_pieces] | sqBB[position->game_t.back().enPassant]);   //position->enPassant[0]);
-        
+
         while(valid_attack_set) {
             sq = lsb_scan(valid_attack_set);
             valid_attack_set ^= sqBB[sq];
@@ -570,12 +443,12 @@ void game::generate_moves() {
             if(sq == position->game_t.back().enPassant) {position->move_t.back().passant_capture = true;}
             if(sq >= 56) {push_promotion(sq, -9);}
         }
-        
+
         valid_attack_set = position->pieceBB[position->white_pawns]; //attack left
         valid_attack_set = valid_attack_set << 7;
         valid_attack_set &= notHfile;
         valid_attack_set &= (position->pieceBB[position->black_pieces] | sqBB[position->game_t.back().enPassant]);
-        
+
         while(valid_attack_set) {
             sq = lsb_scan(valid_attack_set);
             valid_attack_set ^= sqBB[sq];
@@ -583,16 +456,16 @@ void game::generate_moves() {
             if(sq == position->game_t.back().enPassant) {position->move_t.back().passant_capture = true;}
             if(sq >= 56) {push_promotion(sq, -7);}
         }
-        
+
     }
     //DARK//
     else {
         temp = position->pieceBB[position->black_pawns];
-        
+
         valid_attack_set = position->pieceBB[position->black_pawns] >> 8; //single push
         valid_attack_set &= (~position->pieceBB[position->black_pieces]);
         valid_attack_set &= (~position->pieceBB[position->white_pieces]);
-        
+
         temp = valid_attack_set;
         while(temp) {
             sq = lsb_scan(temp);
@@ -600,12 +473,12 @@ void game::generate_moves() {
             push_single_move(sq, sq+8, position->black_pawns);
             if(sq <= 7) {push_promotion(sq, 8);}
         }
-        
+
         valid_attack_set = valid_attack_set >> 8; //double push
         valid_attack_set &= (~position->pieceBB[position->black_pieces]);
         valid_attack_set &= (~position->pieceBB[position->white_pieces]);
         valid_attack_set &= row5;
-        
+
         temp = valid_attack_set;
         while(temp) {
             sq = lsb_scan(temp);
@@ -613,12 +486,12 @@ void game::generate_moves() {
             push_single_move(sq, sq+16, position->black_pawns);
             position->move_t.back().enPassant = sq+8;
         }
-        
+
         valid_attack_set = position->pieceBB[position->black_pawns]; //attack down and left
         valid_attack_set = valid_attack_set >> 9;
         valid_attack_set &= notHfile;
         valid_attack_set &= (position->pieceBB[position->white_pieces] | sqBB[position->game_t.back().enPassant]);
-        
+
         while(valid_attack_set) {
             sq = lsb_scan(valid_attack_set);
             valid_attack_set ^= sqBB[sq];
@@ -626,13 +499,13 @@ void game::generate_moves() {
             if(sq == position->game_t.back().enPassant) {position->move_t.back().passant_capture = true;}
             if(sq <= 7) {push_promotion(sq , 9);}
         }
-        
-        
+
+
         valid_attack_set = position->pieceBB[position->black_pawns]; //attack down and right
         valid_attack_set = valid_attack_set >> 7;
         valid_attack_set &= notAfile;
         valid_attack_set &= (position->pieceBB[position->white_pieces] | sqBB[position->game_t.back().enPassant]);
-        
+
         while(valid_attack_set) {
             sq = lsb_scan(valid_attack_set);
             valid_attack_set ^= sqBB[sq];
@@ -664,7 +537,7 @@ U64 game::eastAttack(char square) {
     }
     else
         return east[square];
-    
+
 }
 U64 game::southEastAttack(char square) {
     U64 temp = position->occupied_squares & southEast[square];
@@ -675,7 +548,7 @@ U64 game::southEastAttack(char square) {
     }
     else
         return southEast[square];
-    
+
 }
 U64 game::southAttack(char square) {
     U64 temp = position->occupied_squares & south[square];
@@ -686,7 +559,7 @@ U64 game::southAttack(char square) {
     }
     else
         return south[square];
-    
+
 }
 U64 game::southWestAttack(char square) {
     U64 temp = position->occupied_squares & southWest[square];
@@ -697,7 +570,7 @@ U64 game::southWestAttack(char square) {
     }
     else
         return southWest[square];
-    
+
 }
 U64 game::westAttack(char square) {
     U64 temp = position->occupied_squares & west[square];
@@ -708,7 +581,7 @@ U64 game::westAttack(char square) {
     }
     else
         return west[square];
-    
+
 }
 U64 game::northWestAttack(char square) {
     U64 temp = position->occupied_squares & northWest[square];
@@ -719,7 +592,7 @@ U64 game::northWestAttack(char square) {
     }
     else
         return northWest[square];
-    
+
 }
 U64 game::northAttack(char square) {
     U64 temp = position->occupied_squares & north[square];
@@ -737,29 +610,29 @@ void game::push_promotion(char sq, int shift) {
         assert(position->integrity());
     bool side = position->side;
     char origin = sq + shift;
-    
+
     position->move_t.back().promotion = true;
     position->move_t.back().promotion_piece = position->queens + side;
-    
+
     push_single_move(sq, origin, position->pawns + side);
     position->move_t.back().promotion = true;
     position->move_t.back().promotion_piece = position->knights + side;
-    
+
     push_single_move(sq, origin, position->pawns + side);
     position->move_t.back().promotion = true;
     position->move_t.back().promotion_piece = position->bishops + side;
-    
+
     push_single_move(sq, origin, position->pawns + side);
     position->move_t.back().promotion = true;
     position->move_t.back().promotion_piece = position->rooks + side;
-    
+
     if(DEBUG_MODE)
         assert(position->integrity());
 }
 
 void game::push_moves(char *dest, char sq, char piece) {
     char i=0;
-    
+
     while(dest[i] != NOT_MOVE) {
         push_single_move(dest[i], sq, piece);
         i++;
@@ -780,7 +653,7 @@ void game::push_single_move(char dest, char sq, char piece) {
     position->move1.enPassant = NOT_MOVE;
     position->move1.passant_capture = false;
     position->move_t.push_back(position->move1);
-    
+
     if(position->move_t.back().capture) {
         if(position->move_t.back().captured_piece == (position->rooks + (!position->move1.side))) {
             if((position->move1.move[1] == 7) && (position->can_castle[position->white_king]))
@@ -814,26 +687,26 @@ int game::check_move(char x, char y) {
 void game::unmake_move() {
     if(DEBUG_MODE)
         assert(position->integrity());
-    
+
     position->makeMove = position->game_t.back();                    //safe the indexed moved into the more convenient/expedient makeMove.
-    
+
     position->game_t.pop_back();
-    
+
     bool side = position->makeMove.side;                      //save the current side into the more convenient/readable side variable
     bool otherSide = !side;                            //save opposite side into the more conv/readable otherSide var.
     char piece = position->makeMove.piece;                    //save the piece in the current move object into the more conv/readable piece var
                                                               //fromToBB holds the location of the pieces origin and destination
-    
+
     if(!position->makeMove.capture && (position->makeMove.piece != (position->pawns + side))) {
         position->fifty_move_rule--;
     }
-    
+
     U64 fromToBB = sqBB[position->makeMove.move[0]] ^ sqBB[position->makeMove.move[1]];
     position->pieceBB[piece] ^= fromToBB;                     //reinstate moving pieces BitBoard
     position->pieceBB[position->pieces + side] ^= fromToBB;          //reinstate moving sides pieces BitBoard
     position->charBoard[position->makeMove.move[1]] = EMPTY;         //reinstate charBoard destination back to empty
     position->charBoard[position->makeMove.move[0]] = piece;         //reinsate charBoard origin back to the moving piece
-    
+
     /*
      for non captures
      */
@@ -862,8 +735,8 @@ void game::unmake_move() {
                                                                                                   //add attacked pawn back to charBoard.
         position->charBoard[position->game_t.back().move[1]] = position->pawns + otherSide;
     }
-    
-    
+
+
     if(position->makeMove.canCastle_off[position->king + side])            //if this move took away castling ability on the king side
         position->can_castle[position->king+side] = true;                   //then reinstate it
     if(position->makeMove.canCastle_off[position->queens + side])          //if this move took away castling ability on the queen side
@@ -872,8 +745,8 @@ void game::unmake_move() {
         position->can_castle[position->king + otherSide] = true;                   //then reinstate it
     if(position->makeMove.canCastle_off[position->queens + otherSide])          //if this move took away castling ability on the queen side
         position->can_castle[position->queens + otherSide] = true;               //then reinsate it
-    
-    
+
+
     /*
      CASTLE KING SIDE
      */
@@ -886,10 +759,10 @@ void game::unmake_move() {
                                                                      //reinstate the charBoard corner to rook
         position->charBoard[position->makeMove.move[1] + 1] = position->rooks + side;
         position->charBoard[position->makeMove.move[1] - 1] = EMPTY;        //reinstate the charBoard rook dest back to empty
-        
+
         position->has_castled[side] = false;
     }
-    
+
     /*
      CASTLE QUEEN SIDE
      */
@@ -902,11 +775,11 @@ void game::unmake_move() {
                                                                      //reinstate corner to rook on charBoard
         position->charBoard[position->makeMove.move[1] - 2] = position->rooks + side;
         position->charBoard[position->makeMove.move[1] + 1] = EMPTY;        //reinstate charBoard rook dest to empty
-        
+
         position->has_castled[side] = false;
     }
-    
-    
+
+
     /*
      PAWN PROMOTION
      */                                                       //if white pawn moved to back rank
@@ -923,7 +796,7 @@ void game::unmake_move() {
      }
      */
     position->switch_side();          //side switched whenever unmake move is called.
-    
+
     if(DEBUG_MODE)
         assert(position->integrity());
 }
@@ -953,11 +826,11 @@ bool game::make_move(const int i) {
         //do it here so as not to do all the make/unmake move business.
     if(position->makeMove.isCastle[position->queens + side] && (position->charBoard[position->makeMove.move[1] - 2] != (position->rooks + side) ) ) {
         return false; }
-    
+
     if(!position->makeMove.capture && (position->makeMove.piece != (position->pawns + side))) {
         position->fifty_move_rule++;
     }
-    
+
     const int it = position->move_t.size();
     position->switch_side();
         //assert(position->integrity());
@@ -987,7 +860,7 @@ bool game::make_move(const int i) {
         position->occupied_squares ^= fromBB;                        //update occupide squares BB
     }
         //assert(position->integrity());
-    
+
     /*
      //note: en passant is not considered a capture, so non capture code above is used
      */
@@ -1009,9 +882,9 @@ bool game::make_move(const int i) {
         position->can_castle[position->king+otherSide] = false;
     if(position->makeMove.canCastle_off[position->queens + otherSide])
         position->can_castle[position->queens + otherSide] = false;
-    
+
         //assert(position->integrity());
-    
+
     /*
      PAWN PROMOTION
      */
@@ -1020,11 +893,11 @@ bool game::make_move(const int i) {
         position->pieceBB[position->makeMove.promotion_piece] ^= sqBB[position->makeMove.move[1]];   //add indicated piece to it's pieces bit board
         position->charBoard[position->makeMove.move[1]] = position->makeMove.promotion_piece;                    //change on charBoard
     }
-    
+
         //push move should be after passant code, because it uses the last move on game_t.
         //but before the king legality code.
     position->push_move(i);
-    
+
     /*
      this move is a castle on the king side
      */
@@ -1059,11 +932,11 @@ bool game::make_move(const int i) {
                 return false;
             }
         }
-        
+
         assert(position->integrity());
         return true;
     }
-    
+
     /*
      this move is a castle on the queen side
      */
@@ -1078,7 +951,7 @@ bool game::make_move(const int i) {
             //assert(position->integrity());
         generate_moves();
         int sizeNow = position->move_t.size();
-        
+
             //this is the check for castling through/out of/into check.
         for(int j = it ; j < sizeNow; j++) {
             if(position->move_t[j].move[1] == position->move_t[i].move[1]) {
@@ -1099,7 +972,7 @@ bool game::make_move(const int i) {
                     //position->clear_move(i);
                 return false;
             }
-            
+
         }
         assert(position->integrity());
         return true;
@@ -1114,10 +987,10 @@ bool game::make_move(const int i) {
             return false;
         }
     }
-    
+
     assert(position->integrity());
     return true;
-    
+
 }
 
 void game::print_move(const int i) {
@@ -1135,18 +1008,18 @@ void game::print_move(const int i) {
     position->move_t[i].canCastle_off[position->white_queens] ? std::cout << "and whites queen side castling.\n" : std::cout << std::endl;
     position->move_t[i].canCastle_off[position->black_king] ? std::cout << "blacks king side castling,\n": std::cout << std::endl;
     position->move_t[i].canCastle_off[position->black_queens] ? std::cout << "and blacks queen side castling.\n": std::cout << std::endl;
-    
+
     std::cout << "Other board information:\n";
    	std::cout << "castling ability: \n";
    	std::cout << "white_kingside: " << position->can_castle[position->white_king];
    	std::cout << " black king side: " << position->can_castle[position->black_king];
    	std::cout << " white queen side: " << position->can_castle[position->white_queens];
    	std::cout << " black queen side: " << position->can_castle[position->black_queens] << std::endl;
-   	
+
    	std::cout << "Bit Boards: \n";
    	std::cout << "occupied squares:\n";
    	position->print_bit_board(position->occupied_squares);
-   	
+
    	bool thisside = position->move_t.back().side;
     std::cout << "kings: \n";
     position->print_bit_board(position->pieceBB[position->king+side]);
@@ -1181,20 +1054,20 @@ void game::print_moves() {
         position->move_t[i].canCastle_off[position->white_queens] ? std::cout << "and whites queen side castling.\n" : std::cout << std::endl;
         position->move_t[i].canCastle_off[position->black_king] ? std::cout << "blacks king side castling,\n": std::cout << std::endl;
         position->move_t[i].canCastle_off[position->black_queens] ? std::cout << "and blacks queen side castling.\n": std::cout << std::endl;
-        
+
     }
-    
+
     std::cout << "Other board information:\n";
     std::cout << "castling ability: \n";
     std::cout << "white_kingside: " << position->can_castle[position->white_king];
     std::cout << " black king side: " << position->can_castle[position->black_king];
     std::cout << " white queen side: " << position->can_castle[position->white_queens];
     std::cout << " black queen side: " << position->can_castle[position->black_queens] << std::endl;
-    
+
     std::cout << "Bit Boards: \n";
     std::cout << "occupied squares:\n";
     position->print_bit_board(position->occupied_squares);
-    
+
     bool thisside = position->move_t.back().side;
     std::cout << "kings: \n";
     position->print_bit_board(position->pieceBB[position->king+thisside]);
@@ -1219,7 +1092,7 @@ char *game::serialize(U64 x) {
         i++;
     }
     tz[i] = NOT_MOVE;
-    
+
     return tz;
 }
 
@@ -1241,12 +1114,6 @@ int game::popcount(U64 b)
     b = b + (b >> 8);
     b = b + (b >> 16);
     b = b + (b >> 32) & 0x0000007F;
-    
+
     return static_cast<int>(b);
 }
-
-
-
-
-
-

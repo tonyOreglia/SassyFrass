@@ -1,6 +1,5 @@
-    //#include <cstdlib>
 #include "board.h"
-#include "eng_global.h"
+#include "global.h"
 
 board::board()
 {
@@ -28,9 +27,7 @@ board::board()
     pieceBB[white_pieces] =  pieceBB[white_king] | pieceBB[white_queens] | pieceBB[white_rooks]
     | pieceBB[white_knights]  | pieceBB[white_bishops] | pieceBB[white_pawns];
     pieceBB[black_pieces] = occupied_squares ^ pieceBB[white_pieces];
-    
-        //move_t.reserve(102400);
-    
+
     for(char i=0;i<64;i++) {
         charBoard[i] = EMPTY;
         if(i==0 || i==7)
@@ -58,52 +55,38 @@ board::board()
         if(i==60)
             charBoard[i] = black_king;
     }
-    
+
     can_castle[white_king] = true;
     can_castle[white_queens] = true;
     can_castle[black_king] = true;
     can_castle[black_queens] = true;
-    
+
     has_castled[LIGHT] = false;
     has_castled[DARK] = false;
-    
+
     move1.piece = king;
     move1.move[0] = 7; //row 0 coll 7
     move1.move[1] = 53; //row 6 coll 5
-    
+
     move1.canCastle_off[white_king] = false;
     move1.canCastle_off[white_queens] = false;
     move1.canCastle_off[black_king] = false;
     move1.canCastle_off[black_queens] = false;
-    
+
     move1.isCastle[white_king] = false;
     move1.isCastle[white_queens] = false;
     move1.isCastle[black_king] = false;
     move1.isCastle[black_queens] = false;
-    
+
     move1.enPassant = NOT_MOVE;
     move1.passant_capture = false;
-    
+
     move1.promotion = false;
     move1.promotion_piece = EMPTY;
-    
+
     game_t.push_back(move1);
-    
     fifty_move_rule = 0;
-        //repetition = 0;
     full_move_count = 0; //updated after blacks moves
-    
-    /*	char temp[6] = {1, 1, 2, 4, 3, 10}; //Bking = 0, Bqueens, Brooks, Bknights, Bbishops, Bpawns
-     for(char k=0; k<6; k++) {
-     battle_value[k] = temp[k];
-     }
-     
-     for(char j=0;j<2;j++) {
-     for(char k=0; k<64; k++) {
-     battle_field[j][k] = 0;
-     }
-     }
-     */
 }
 
 void board::print_char_board() {
@@ -130,17 +113,17 @@ bool board::import_FEN(char *fen, char *side_to_move, char *castling_rights, cha
     char letter, sq;
     int aRank, aFile;
     char *str_token;
-    
+
     str_token = fen;
         //assert(str_token);
-    
+
     for(char k=0; k<64; k++) charBoard[k] = EMPTY;
-    
+
     char j = 63;
     for(char i=0; i<strlen(str_token); i++) {\
         char index = j + 7 - (2 * (j % 8));
         letter = str_token[i];
-        
+
         switch (letter)
         {
             case 'p' : charBoard[index] = black_pawns; break;
@@ -169,18 +152,18 @@ bool board::import_FEN(char *fen, char *side_to_move, char *castling_rights, cha
         j--;
     }
     print_char_board();
-    
+
         //declare whose turn it is
     str_token = side_to_move;
     assert(str_token);
     if(str_token[0] == 'w') side = LIGHT;
     else if(str_token[0] == 'b') side = DARK;
     else return false;
-    
+
     game_t.back().side = !side;
-    
+
     std::cout << "\n\n\tside: " << side << std::endl;
-    
+
     str_token = castling_rights;
     assert(str_token);
     can_castle[0] = false;
@@ -198,19 +181,19 @@ bool board::import_FEN(char *fen, char *side_to_move, char *castling_rights, cha
             default : return false;
         }
     }
-    
+
     std::cout << "\n\t\tK: " << can_castle[white_king];
     std::cout << "\n\t\tQ: " << can_castle[white_queens];
     std::cout << "\n\t\tk: " << can_castle[black_king];
     std::cout << "\n\t\tq: " << can_castle[black_queens];
-    
-    
+
+
         //en passant square
     str_token = en_passant;
     assert(str_token);
-    
+
     std::cout << "\n\tenPassant: " << str_token[0] << str_token[1];
-    
+
     if(str_token[0] != '-')  {
         sq = str_token[0] - 97;       // 'a' = 0
         sq = sq + (str_token[1] - 49) * 8;
@@ -219,23 +202,23 @@ bool board::import_FEN(char *fen, char *side_to_move, char *castling_rights, cha
         if(side == DARK) {game_t.back().move[1] = sq + 8;}
         else {game_t.back().move[1] = sq - 8;}
     }
-    
-    
+
+
     std::cout << "\n\tenPassant: " << static_cast<int>(game_t.back().enPassant);
-    
+
         //full and half move counts;
     str_token = fifty_move;
     assert(str_token);
     fifty_move_rule = atoi(str_token);
-    
+
     std::cout << "\n\thalf move non pawn non capture count: " << fifty_move_rule << std::endl;
-    
+
     str_token = full_moves;
     assert(str_token);
     full_move_count = atoi(str_token);
-    
+
     std::cout << "\n\tfull move count: " << full_move_count << std::endl;
-    
+
     pieceBB[white_king] = 0ULL;
     pieceBB[black_king] = 0ULL;
     pieceBB[white_queens] = 0ULL;
@@ -248,13 +231,13 @@ bool board::import_FEN(char *fen, char *side_to_move, char *castling_rights, cha
     pieceBB[black_bishops] = 0ULL;
     pieceBB[white_pawns] = 0ULL;
     pieceBB[black_pawns] = 0ULL;
-    
+
     for(char k=0; k<64; k++) {
         if(charBoard[k] != EMPTY) {
             pieceBB[charBoard[k]] |= (1ULL << k);
         }
     }
-    
+
     occupied_squares = pieceBB[white_king] | pieceBB[black_king] | pieceBB[white_queens]
     | pieceBB[black_queens] | pieceBB[white_rooks] | pieceBB[black_rooks]
     | pieceBB[white_knights] | pieceBB[black_knights] | pieceBB[white_bishops]
@@ -263,7 +246,7 @@ bool board::import_FEN(char *fen, char *side_to_move, char *castling_rights, cha
     | pieceBB[white_knights]  | pieceBB[white_bishops] | pieceBB[white_pawns];
     pieceBB[black_pieces] = pieceBB[black_king] | pieceBB[black_queens] | pieceBB[black_rooks]
     | pieceBB[black_knights]  | pieceBB[black_bishops] | pieceBB[black_pawns];
-    
+
         //assert(integrity());
     return true;
 }
@@ -296,7 +279,7 @@ void board::print_bit_board(U64 x)
         std::cout << bb[i];
     std::cout << std::endl;
     std::cout << std::endl;
-    
+
 }
 
 bool board::integrity() {
@@ -325,7 +308,7 @@ bool board::integrity() {
         std::cout << "Piece BBs don't match occupied BB\n";
         ret =  false;
     }
-    
+
         //castling rights make sense
     if(can_castle[white_king]) {
         if(charBoard[7] != white_rooks) {
@@ -359,7 +342,7 @@ bool board::integrity() {
             }
         }
     }
-    
+
         //white piece BB match piece BB
     U64 temp = pieceBB[white_king] | pieceBB[white_queens] | pieceBB[white_rooks] | pieceBB[white_knights]  | pieceBB[white_bishops] | pieceBB[white_pawns];
     if(pieceBB[white_pieces] != temp) {
@@ -379,12 +362,12 @@ bool board::integrity() {
         std::cout << "Game Moves:\n";
         print_game_moves();
         std::cout << "\nIntegrity Failed.\n\n";
-        
+
         std::cout << "Bit Boards: \n";
         std::cout << "occupied squares:\n";
         print_bit_board(occupied_squares);
-        
-        
+
+
         std::cout << "kings: \n";
         print_bit_board(pieceBB[king+side]);
         std::cout << "pawns\n";
@@ -398,7 +381,7 @@ bool board::integrity() {
         std::cout << "this sides pieces: \n";
         print_bit_board(pieceBB[pieces + side]);
         std::cout << "\n";
-        
+
         bool otherSide = !side;
         std::cout << "other side kings: \n";
         print_bit_board(pieceBB[king+otherSide]);
@@ -414,7 +397,7 @@ bool board::integrity() {
         print_bit_board(pieceBB[pieces + otherSide]);
         std::cout << "\n";
         print_char_board();
-        
+
         int input = 1;
         while(input >= -1) {
             std::cout << "Enter move index to print: ";
@@ -425,9 +408,9 @@ bool board::integrity() {
                 std::cout << "\tmove_t size: " << move_t.size() << std::endl;
             }
         }
-        
+
     }
-    
+
     return ret;
 }
 
@@ -468,7 +451,7 @@ void board::print_generated_moves() {
         move_t[i].canCastle_off[white_queens] ? std::cout << "and whites queen side castling.\n" : std::cout << std::endl;
         move_t[i].canCastle_off[black_king] ? std::cout << "blacks king side castling,\n": std::cout << std::endl;
         move_t[i].canCastle_off[black_queens] ? std::cout << "and blacks queen side castling.\n": std::cout << std::endl;
-        
+
     }
 }
 
@@ -486,23 +469,23 @@ void board::print_specified_move(int i) {
     move_t[i].canCastle_off[white_queens] ? std::cout << "and whites queen side castling.\n" : std::cout << std::endl;
     move_t[i].canCastle_off[black_king] ? std::cout << "blacks king side castling,\n": std::cout << std::endl;
     move_t[i].canCastle_off[black_queens] ? std::cout << "and blacks queen side castling.\n": std::cout << std::endl;
-    
+
 }
 
 void board::print_algebraic(int i) {
     char st = game_t[i].move[0];
     char dest = game_t[i].move[1];
-    
+
     int row, collumn;
-    
+
     char coll_lett[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
     collumn = st % 8;
     row = (st / 8) + 1;
-    
+
     std::cout << "\t" << coll_lett[collumn] << row;
-    
+
     collumn = dest % 8;
     row = (dest / 8) + 1;
-    
+
     std::cout << " " << coll_lett[collumn] << row;
 }

@@ -1,18 +1,12 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <stdint.h>
 #include <bitset>
 #include <iostream>
 #include <vector>
 #include <cstring>
 #include <assert.h>
-
-#include "macros.txt"
-
-    //#include "eng_global.h"
-
-typedef uint64_t U64;
+#include "global.h"
 
 class board
 {
@@ -45,15 +39,23 @@ private:
     bool checkmate;
     bool stalemate;
     int fifty_move_rule;
-    //char repetition;
     int full_move_count;
     bool side;
     U64 pieceBB[14];
     U64 occupied_squares;
-    //char16_t battle_field[2][64];
-    //char battle_value[6];
     bool can_castle[4];
     bool has_castled[2];
+    enum Algebraic_Square
+    {
+        A1=0, B1, C1, D1, E1, F1, G1, H1,
+        A2, B2, C2, D2, E2, F2, G2, H2,
+        A3, B3, C3, D3, E3, F3, G3, H3,
+        A4, B4, C4, D4, E4, F4, G4, H4,
+        A5, B5, C5, D5, E5, F5, G5, H5,
+        A6, B6, C6, D6, E6, F6, G6, H6,
+        A7, B7, C7, D7, E7, F7, G7, H7,
+        A8, B8, C8, D8, E8, F8, G8, H8
+    };
     enum enumPiece
     {
         white_king=0, black_king,
@@ -70,32 +72,21 @@ private:
     enum battle_piece {
         Bking = 0, Bqueens, Brooks, Bknights, Bbishops, Bpawns
     };
-    enum Algebraic_Square
-    {
-        A1=0, B1, C1, D1, E1, F1, G1, H1,
-        A2, B2, C2, D2, E2, F2, G2, H2,
-        A3, B3, C3, D3, E3, F3, G3, H3,
-        A4, B4, C4, D4, E4, F4, G4, H4,
-        A5, B5, C5, D5, E5, F5, G5, H5,
-        A6, B6, C6, D6, E6, F6, G6, H6,
-        A7, B7, C7, D7, E7, F7, G7, H7,
-        A8, B8, C8, D8, E8, F8, G8, H8
-    };
-    
+
     struct move_info {
         char move[2];
         bool side;           //LIGHT=0 or DARK=1
-        
+
         char piece;          //king=0, queens=2,rooks=4,bishops=6,pawns=8
         char captured_piece; //king=0, queens=2,rooks=4,bishops=6,pawns=8
         bool capture;        //is this move a capture
-        
+
         bool canCastle_off[4];
         bool isCastle[4];
-        
+
         bool passant_capture;   //is this move a capture using en passant
         char enPassant;         //if the pawn is pushed two places, set en passant square, along with the square the pawn is on for capture porpoises
-        
+
         bool promotion;
         char promotion_piece;
     };

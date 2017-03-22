@@ -1,12 +1,9 @@
 #include <iostream>
 #include <string>
 #include <climits>
-
-#include "macros.txt"
-#include "eng_global.h"
-
 #include "game.h"
 #include "board.h"
+#include "global.h"
 
 using namespace std;
 
@@ -35,31 +32,31 @@ int main(int argc, char *argv[]) {
     board    board;
     game     play(&board);
     bool     user_color, eng_color;
-    
+
     assert(board.integrity());
-    
-    DEPTH = 5;
-    DEBUG_MODE = false;
-    
+
+    // DEPTH = 5;
+    // DEBUG_MODE = false;
+
     manage_arguments(board, argc, argv);
-    
+
     print_depth();
     print_debug_mode();
-    
+
     cout << "\n\n\t\tWelcome to Tony's Chess Engine!\n\n\n";
     board.print_char_board();
     play.generate_moves();
-    
+
     user_color = get_user_color();
     eng_color = !user_color;
-    
-    
+
+
     while(true) {
-        
+
         if((board.get_side() == user_color) && (!eng_v_eng)) {
-            
+
             if(board.get_move_count()) {
-                
+
                 while(true) {
                     std::cout << "\n\t\tEnter a command: ";
                     std::cin >> command;
@@ -94,12 +91,12 @@ int main(int argc, char *argv[]) {
                 exit(1);
             }
         }
-        
+
         //Engine's turn
         if((board.get_side() != user_color) || eng_v_eng) {
             move_index = get_engine_move(play, board);
         }
-        
+
         make_move(move_index, play, board);
     }
 }
@@ -128,16 +125,16 @@ void manage_arguments(board board, int argc, char *argv[]) {
 
 void make_move(int move_index, game &play, board &board) {
     int move_count = board.get_move_count();
-    
+
     if(move_index != NOT_MOVE) {                 //is human players move in the generated valid move list?
         if(play.make_move(move_index)) {          //make move fxn checks for king safety, and legal castling (not checked for in move generator)
             board.clear_moves(0, move_count);             //clear move list, don't clear the generated dark moves since those are
-            
+
             board.print_char_board();                     //print the new valid position
             std::cout << "\tLast Move:";
             board.print_algebraic(board.get_game_mv_cnt()-1);
             cout << "\n\tscore: " << play.evaluate() << "\n\n";
-            
+
         }
         else {
             std::cout << "\n\n\t\tInvalid Move.\n\t\tLeave's King in Check or castles illegally.\n\n";
@@ -161,12 +158,12 @@ int get_engine_move(game &play, board &board) {
         else
             play.search_min(DEPTH, 0);
     }
-    
+
     if(DEBUG_MODE)
         std::cout << "\n\tperft_total:\t" << play.get_perft_total() << std::endl;
-    
+
     std::cout << "engine move: " << static_cast<int>(play.get_engine_move()) << std::endl;
-    
+
     return play.get_engine_move();
 }
 
@@ -183,7 +180,7 @@ void unmake_move(game &play, board &board) {
 int get_user_move(int &x, int &y, game &play, string command) {
     string from, dest;
     int move_index;
-    
+
     from = command;
     std::cin >> dest;
     while(true) {
@@ -222,7 +219,7 @@ void get_depth() {
 bool get_user_color() {
     bool user_color;
     string input;
-    
+
     while(true) {
         std::cout << "\n\t\tWould you like to play as light or dark? ";
         std::cin >> input;
@@ -244,7 +241,7 @@ bool get_user_color() {
 //convert user input from algebriac to index
 ///////////////////////////////////////////////////
 bool convert_algebraic(string x, string y, int &xx, int &yy) {
-    
+
     switch (x[0]) {
         case 'a':
             xx = 0;
@@ -272,7 +269,7 @@ bool convert_algebraic(string x, string y, int &xx, int &yy) {
             break;
     }
     xx = xx + (static_cast<int>(x[1])-49)*8;
-    
+
     switch (y[0]) {
         case 'a':
             yy = 0;
@@ -300,6 +297,6 @@ bool convert_algebraic(string x, string y, int &xx, int &yy) {
             break;
     }
     yy = yy + (static_cast<int>(y[1])-49)*8;
-    
+
     return true;
 }

@@ -1,11 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
-
-#include <stdint.h>
 #include <assert.h>
-
 #include "board.h"
-    //#include "eng_global.h"
+#include "global.h"
 
 class game
 {
@@ -13,7 +10,6 @@ public:
     game();
     ~game();
     game(board *b);
-        //char think();
     int search_max(char depth, int start);
     int search_min(char depth, int start);
     int alpha_beta_max(int alpha, int beta, char depth, int start);
@@ -59,4 +55,3 @@ private:
     int score;
 };
 #endif
-
